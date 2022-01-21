@@ -9,8 +9,9 @@ function createToken(user) {
 }
  
 exports.registerUser = (req, res) => {
-    if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ 'msg': 'You need to send email and password' });
+
+    if (req.body.password != req.body.confirmpassword) {
+        return res.status(400).json({'msg':'Password and confirm password don\'t match!'});
     }
  
     User.findOne({ email: req.body.email }, (err, user) => {
@@ -19,7 +20,25 @@ exports.registerUser = (req, res) => {
         }
  
         if (user) {
-            return res.status(400).json({ 'msg': 'The user already exists' });
+            return res.status(400).json({ 'msg': 'The user already exists!' });
+        }
+ 
+        let newUser = User(req.body);
+        newUser.save((err, user) => {
+            if (err) {
+                return res.status(400).json({ 'msg': err });
+            }
+            return res.status(201).json(user);
+        });
+    });
+
+    User.findOne({ phone: req.body.phone }, (err, user) => {
+        if (err) {
+            return res.status(400).json({ 'msg': err });
+        }
+ 
+        if (user) {
+            return res.status(400).json({ 'msg': 'The user already exists!' });
         }
  
         let newUser = User(req.body);
@@ -43,7 +62,7 @@ exports.loginUser = (req, res) => {
         }
  
         if (!user) {
-            return res.status(400).json({ 'msg': 'The user does not exist' });
+            return res.status(400).json({ 'msg': 'The user does not exist!' });
         }
  
         user.comparePassword(req.body.password, (err, isMatch) => {
@@ -52,8 +71,11 @@ exports.loginUser = (req, res) => {
                     token: createToken(user)
                 });
             } else {
-                return res.status(400).json({ msg: 'The email and password don\'t match.' });
+                return res.status(400).json({ msg: 'The email and password don\'t match!' });
             }
         });
     });
+
+   
+
 };

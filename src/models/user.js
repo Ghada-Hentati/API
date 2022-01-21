@@ -2,6 +2,10 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
   
 var UserSchema = new mongoose.Schema({
+  name: {
+        type: String,
+        required: true
+    }, 
   email: {
         type: String,
         unique: true,
@@ -11,6 +15,15 @@ var UserSchema = new mongoose.Schema({
     },
   password: {
         type: String,
+        required: true
+    },
+  confirmpassword: {
+        type: String,
+        required: true
+    },
+  phone: {
+        type: Number,
+        unique: true,
         required: true
     }
 });
@@ -27,9 +40,12 @@ UserSchema.pre('save',  function(next) {
              if (err) return next(err);
  
              user.password = hash;
+             user.confirmpassword = hash;
              next();
          });
      });
+
+
 });
  
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
@@ -40,3 +56,4 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
 };
  
 module.exports = mongoose.model('User', UserSchema);
+
